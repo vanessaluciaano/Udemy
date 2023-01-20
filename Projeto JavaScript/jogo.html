@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Estourando Balões</title>
+    <script src="jogo.js"></script>
+</head>
+
+<body onload="iniciaJogo()">
+    <div style="float: left; width: auto; height: 500px; background: white; border: solid 1px #a2a2a2; margin-right: 5px;">
+        <table>
+            <tr>
+                <td>
+                    <img src="imagens/balao_azul_grande.png">
+                </td>
+                <td>
+                    <span style="font-size: 40px;"id="baloes_inteiros"></span>                
+                </td>
+            </tr>
+        </table>
+        <br>
+        <table>
+            <tr>
+                <td>
+                    <img src="imagens/balao_azul_grande_estourado.png">
+                </td>
+                <td>
+                    <span style="font-size: 40px;" id="baloes_estourados"></span>
+                </td>
+            </tr>
+        </table>
+        <br>
+        <table style="width: 140px; height: 132px;">
+            <tr>
+                <td style="background: url('imagens/cronometro.png'); text-align: center;">
+                    <span style="color:red; font-size: 30px;" id="cronometro"></span>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="cenario" style="float: left; width: 600px; height: 500px; background: url(imagens/cenario.png); background-position: bottom;">
+    </div>
+    <div style="float:right; margin-right: 20%; margin-top: 15%; background-position: center; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">
+        <p>Clique abaixo para reiniciar o jogo:</p>
+        <hr>
+        <input type="button" name="reinicia" id="reinicia" value="REINICIAR" onclick="reiniciar()" style="width: 120px; height: 70px; border-radius: 20%; margin-left: 24%; color: blue; border-color: blue;">
+    </div> 
+</body>
+
+</html>
