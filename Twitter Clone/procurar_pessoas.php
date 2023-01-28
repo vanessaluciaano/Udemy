@@ -6,6 +6,35 @@
 		header('Location: index.php?erro=1');
 	}
 
+	require_once('db.class.php');
+
+	$objDb = new db();
+	$link = $objDb->conecta_mysql();
+
+	$id_usuario = $_SESSION['id_usuario'];
+
+	//--qtde de tweets
+	$sql = " SELECT COUNT(*) AS qtde_tweets FROM tweet WHERE id_usuario = $id_usuario ";
+	$resultado_id = mysqli_query($link, $sql);
+	$qtde_tweets = 0;
+	if($resultado_id){
+		$registro = mysqli_fetch_array($resultado_id, MYSQLI_ASSOC);
+		$qtde_tweets = $registro['qtde_tweets'];
+	} else {
+		echo 'Erro ao executar a query';
+	}
+
+	//--qtde de seguidores
+	$sql = " SELECT COUNT(*) AS qtde_seguires FROM usuarios_seguidores WHERE seguindo_id_usuario = $id_usuario ";
+	$resultado_id = mysqli_query($link, $sql);
+	$qtde_seguidores = 0;
+	if($resultado_id){
+		$registro = mysqli_fetch_array($resultado_id, MYSQLI_ASSOC);
+		$qtde_seguidores = $registro['qtde_seguires'];
+	} else {
+		echo 'Erro ao executar a query';
+	}
+
 ?>
 
 <!DOCTYPE HTML>
@@ -21,49 +50,65 @@
 		<!-- bootstrap - link cdn -->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 	
-	<script type="text/javascript">
-		$(document).ready( function(){
-			$('#btn_procurar_pessoa').click( function(){
-				
-				if($('#nome_pessoa').val().length > 0){
-					$.ajax({
-						url: 'get_pessoas.php',
-						method: 'post',
-						data: $('#form_procuar_pessoas').serialize(),
-						success: function(data){
-							$('#pessoas').html(data);
-                            $('.btn_seguir').click(function(){
-                                var id_usuario  = $(this).data('id_usuario');
+		<script type="text/javascript">
 
-                                $.ajax({
-                                    urel: 'segguir.php',
-                                    method: 'post',
-                                    data: {seguir_id_usuario: id_usuario},
-                                    sucess: function(data){
+			$(document).ready( function(){
 
-                                    }
-                                });
-                            });
-                            $('.btn_deixar_seguir').click(function(){
-                                var id_usuario = $(this).data('id_usuario');
-                                $.ajax({
-                                    url: 'deixar_seguir.php',
-                                    method: 'post',
-                                    data: {deixar_seguir_id_usuario: id_usuario},
-                                    sucess: function(data){
-                                        
-                                    }
-                                })
+				//associar o evento de click ao botão
+				$('#btn_procurar_pessoa').click( function(){
+					
+					if($('#nome_pessoa').val().length > 0){
+						
+						$.ajax({
+							url: 'get_pessoas.php',
+							method: 'post',
+							data: $('#form_procurar_pessoas').serialize(),
+							success: function(data) {
+								$('#pessoas').html(data);
 
-                            });
-						}
-					})
-				}
+								$('.btn_seguir').click( function(){
+									var id_usuario = $(this).data('id_usuario');
+
+									$('#btn_seguir_'+id_usuario).hide();
+									$('#btn_deixar_seguir_'+id_usuario).show();
+
+									$.ajax({
+										url: 'seguir.php',
+										method: 'post',
+										data: { seguir_id_usuario: id_usuario },
+										success: function(data){
+											header('Location: home.php');
+										}
+									});
+
+								});
+
+								$('.btn_deixar_seguir').click( function(){
+									var id_usuario = $(this).data('id_usuario');
+
+									$('#btn_seguir_'+id_usuario).show();
+									$('#btn_deixar_seguir_'+id_usuario).hide();
+
+									$.ajax({
+										url: 'deixar_seguir.php',
+										method: 'post',
+										data: { deixar_seguir_id_usuario: id_usuario },
+										success: function(data){
+											header('Location: home.php');
+											;
+										}
+									});
+
+								});
+							}
+						});
+					}
+
+				});
+
 			});
 
-
-		});
-	</script>
+		</script>
 
 	</head>
 
@@ -84,8 +129,8 @@
 	        
 	        <div id="navbar" class="navbar-collapse collapse">
 	          <ul class="nav navbar-nav navbar-right">
-              <li><a href="sair.php">Sair</a></li>
-              <li><a href="home.php">Home</a></li>
+	          	<li><a href="home.php">Home</a></li>
+	            <li><a href="sair.php">Sair</a></li>
 	          </ul>
 	        </div><!--/.nav-collapse -->
 	      </div>
@@ -93,44 +138,43 @@
 
 
 	    <div class="container">
-	    	
 	    	<div class="col-md-3">
-				<div class="panel panel-default">
-					<div class="panel-body">
-						<h4><?= $_SESSION['usuario'] ?></h4>
-						<hr>
-						<div class="col-md-6">
-							TWEETS <br> 1
-						</div>
-						<div class="col-md-6">
-							SEGUIDORES <br> 1
-						</div>
-					</div>
-				</div>
-			</div>
+	    		<div class="panel panel-default">
+	    			<div class="panel-body">
+	    				<h4><?= $_SESSION['usuario'] ?></h4>
+
+	    				<hr />
+	    				<div class="col-md-6">
+	    					TWEETS <br /> <?= $qtde_tweets ?>
+	    				</div>
+	    				<div class="col-md-6">
+	    					SEGUIDORES <br /> <?= $qtde_seguidores ?>
+	    				</div>
+	    			</div>
+	    		</div>
+	    	</div>
+	    	
 	    	<div class="col-md-6">
 	    		<div class="panel panel-default">
-					<div class="panel-body">
-						<form id="form_procurar_pessoas" class="input-group">
-							<input type="text" id="nome_pessoa" name="nome_pessoa" class="form-control" placeholder="Quem você está procurando?" maxlength="140">
-							<span class="input-group-btn">
-								<button class="btn btn-default" id="btn_procurar_pessoa" type="button">Procurar</button>
-							</span>
-						</form>
-					</div>
-				</div>
-				<div id="pessoas" class="list-group">
+	    			<div class="panel-body">
+	    				<form id="form_procurar_pessoas" class="input-group">
+	    					<input type="text" id="nome_pessoa" name="nome_pessoa" class="form-control" placeholder="Quem você está procurando?" maxlength="140" />
+	    					<span class="input-group-btn">
+	    						<button class="btn btn-default" id="btn_procurar_pessoa" type="button">Procurar</button>
+	    					</span>
+	    				</form>
+	    			</div>
+	    		</div>
 
-				</div>
+	    		<div id="pessoas" class="list-group"></div>
+
 			</div>
 			<div class="col-md-3">
 				<div class="panel panel-default">
 					<div class="panel-body">
-				
 					</div>
 				</div>
 			</div>
-
 		</div>
 
 

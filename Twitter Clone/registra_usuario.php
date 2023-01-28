@@ -9,59 +9,60 @@
 	$objDb = new db();
 	$link = $objDb->conecta_mysql();
 
-$usuario_existe = false;
-$email_existe = false;
+	$usuario_existe = false;
+	$email_existe = false;
 
-    //verifica se o usuario e email ja existe
-    $sql = "select * from usuarios where usuario = '$usuario' ";
-   
-    if($resultado_id = mysqli_query($link, $sql)){
+	//verificar se o usuário já
+	$sql = " select * from usuarios where usuario = '$usuario' ";
+	if($resultado_id = mysqli_query($link, $sql)) {
 
-       $dados_usuario = mysqli_fetch_array($resultado_id);
+		$dados_usuario = mysqli_fetch_array($resultado_id);
 
-       if(isset($dados_usuario['usuario'])){
-        $usuario_existe = true;
-       }
+		if(isset($dados_usuario['usuario'])){
+			$usuario_existe = true;
+		}
+	} else {
+		echo 'Erro ao tentar localizar o registro de usuário';
+	}
 
-    } else{
-    echo 'Erro ao tentar localizar o registro do usuário';
-    }
+	//verificar se o e-mail já
+	$sql = " select * from usuarios where email = '$email' ";
+	if($resultado_id = mysqli_query($link, $sql)) {
 
-    // verifica email
-    $sql = "select * from usuarios where email = '$email' ";
-   
-    if($resultado_id = mysqli_query($link, $sql)){
+		$dados_usuario = mysqli_fetch_array($resultado_id);
 
-       $dados_usuario = mysqli_fetch_array($resultado_id);
+		if(isset($dados_usuario['email'])){
+			$email_existe = true;
+		} 
+	} else {
+		echo 'Erro ao tentar localizar o registro de email';
+	}
 
-       if(isset($dados_usuario['email'])){
-        $email_existe = true;
-       }
 
-    } else{
-    echo 'Erro ao tentar localizar o registro do email';
-    }
+	if($usuario_existe || $email_existe){
 
-    if($usuario_existe || $email_existe){
-    $retorno_get = '';
+		$retorno_get = '';
 
-    if($usuario_existe){
-        $retorno_get .= "erro_usuario=1&";
-    }
+		if($usuario_existe){
+			$retorno_get.= "erro_usuario=1&";
+		}
 
-    if($email_existe){
-        $retorno_get .= "erro_email=1&";
-    }
+		if($email_existe){
+			$retorno_get.= "erro_email=1&";
+		}
 
-    header('Location: increvase.php?'. $retorno_get);
-    die();
-    }
+		header('Location: inscrevase.php?'.$retorno_get);
+		die();
+	}
 
 	$sql = " insert into usuarios(usuario, email, senha) values ('$usuario', '$email', '$senha') ";
 
 	//executar a query
 	if(mysqli_query($link, $sql)){
-		echo 'Usuário registrado com sucesso!';
+		echo '<p>Usuário registrado com sucesso!</p>';
+	echo '<h4><a href="Home.php">Clique aqui para entrar</h4>';
+
+
 	} else {
 		echo 'Erro ao registrar o usuário!';
 	}
