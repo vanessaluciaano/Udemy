@@ -5,6 +5,7 @@ session_start();
 unset($_SESSION['usuario']);
 unset($_SESSION['email']);
 
-echo 'Esperamos você de volta em breve!!!'
+$erro = isset($_GET['erro']) ? $_GET['erro'] : 0;
+header('Location: home.php');
 
 ?>
